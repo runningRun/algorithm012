@@ -280,6 +280,160 @@ public:
     }
 };
 
+/*
+ * 官方题解：https://leetcode-cn.com/problems/word-ladder/solution/dan-ci-jie-long-by-leetcode/
+ * F1: BFS
+*/
+
+class Solution {
+public:
+    int ladderLength(string beginWord, string endWord, vector<string>& wordList) {   
+        // 以输入hit, cog, ["hot","dot","dog","lot","log","cog"]为例
+        /* 将wordList格式化为:
+         * hot: *ot => [hot, dot, lot]; h*t => [hot]; ho* => [hot]
+         * dot: *ot                   ; d*t => [dot]; do* => [dot, dog]
+         * dog: *og => [dog, log, cog]; d*g => [dog]; do* 
+         * lot: *ot                   ; l*t => [lot]; lo* => [lot, log]
+         * log: *og                   ; l*g => [log]; lo*
+         * cog: *og                   ; c*g => [cog]; co* => [cog]
+        */
+
+        unordered_map<string, unordered_set<string>> formatWordMap;
+        for (string word : wordList) {
+            string tmpWord = word;
+            for (int index = 0; index < tmpWord.size(); ++index) {
+                char oldChar = tmpWord[index];
+                tmpWord[index] = '*';
+                formatWordMap[tmpWord].insert(word);
+                tmpWord[index] = oldChar;
+            }
+        }
+
+        // for (pair<const string, unordered_set<string>> &item : formatWordMap) {
+        //     cout << item.first << ": ";
+        //     for (const string &v : item.second) {
+        //         cout << " " << v;
+        //     }
+        //     cout << endl;
+        // }
+
+        // BFS
+        map<string, bool> visited;
+        queue<pair<string, int>> wordLevelQueue;
+        wordLevelQueue.push({beginWord, 1});
+        while (!wordLevelQueue.empty()) {
+            pair<string, int> node = wordLevelQueue.front();
+            wordLevelQueue.pop();
+            string tmpWord = node.first;
+            int tmpLevel = node.second;
+            // 处理每一个与之相邻的单词
+            for (int index = 0; index < tmpWord.size(); ++index) {
+                char oldChar = tmpWord[index];
+                tmpWord[index] = '*';
+                if (visited[tmpWord]) {
+                    tmpWord[index] = oldChar;
+                    continue;
+                }
+
+                // 获取经过变换第index位可以到达的邻居
+                unordered_set<string> &neighbors = formatWordMap[tmpWord];
+                if (neighbors.find(endWord) != neighbors.end()) {
+                    // 找到了目标节点
+                    return tmpLevel + 1;
+                } else {
+                    // 每一个相邻节点入Queue
+                    for (const string &neighbor : neighbors) {
+                        wordLevelQueue.push({neighbor, tmpLevel + 1});
+                    }
+                }
+                visited[tmpWord] = true;
+                tmpWord[index] = oldChar;
+            }
+        }
+
+        return 0;
+    }
+};
+
+class Solution {
+public:
+    int ladderLength(string beginWord, string endWord, vector<string>& wordList) {   
+        // 以输入hit, cog, ["hot","dot","dog","lot","log","cog"]为例
+        /* 将wordList格式化为:
+         * hot: *ot => [hot, dot, lot]; h*t => [hot]; ho* => [hot]
+         * dot: *ot                   ; d*t => [dot]; do* => [dot, dog]
+         * dog: *og => [dog, log, cog]; d*g => [dog]; do* 
+         * lot: *ot                   ; l*t => [lot]; lo* => [lot, log]
+         * log: *og                   ; l*g => [log]; lo*
+         * cog: *og                   ; c*g => [cog]; co* => [cog]
+        */
+
+        unordered_map<string, unordered_set<string>> formatWordMap;
+        for (string word : wordList) {
+            string tmpWord = word;
+            for (int index = 0; index < tmpWord.size(); ++index) {
+                char oldChar = tmpWord[index];
+                tmpWord[index] = '*';
+                formatWordMap[tmpWord].insert(word);
+                tmpWord[index] = oldChar;
+            }
+        }
+
+        for (pair<const string, unordered_set<string>> &item : formatWordMap) {
+            cout << item.first << ": ";
+            for (const string &v : item.second) {
+                cout << " " << v;
+            }
+            cout << endl;
+        }
+
+        // BFS
+        map<string, bool> visited;
+        queue<pair<string, int>> wordLevelQueue;
+        wordLevelQueue.push({beginWord, 1});
+        visited[beginWord] = true;
+        while (!wordLevelQueue.empty()) {
+            pair<string, int> node = wordLevelQueue.front();
+            wordLevelQueue.pop();
+            string tmpWord = node.first;
+            int tmpLevel = node.second;
+            cout << "word: " << tmpWord << ":" << endl;
+            // 处理每一个与之相邻的单词
+            for (int index = 0; index < tmpWord.size(); ++index) {
+                char oldChar = tmpWord[index];
+                tmpWord[index] = '*';
+                cout << "\t" << tmpWord << "==>";
+                if (visited[tmpWord]) {
+                    tmpWord[index] = oldChar;
+                    cout << "-----------visited!" << endl;
+                    continue;
+                }
+
+                // 获取经过变换第index位可以到达的邻居
+                unordered_set<string> &neighbors = formatWordMap[tmpWord];
+                if (neighbors.find(endWord) != neighbors.end()) {
+                    // 找到了目标节点
+                    // return tmpLevel + 1;
+                    cout << " found!! " << endl;
+                    continue;
+                } else {
+                    // 每一个相邻节点入Queue
+                    for (const string &neighbor : neighbors) {
+                        cout << neighbor << " " ;
+                        wordLevelQueue.push({neighbor, tmpLevel + 1});
+                    }
+                }
+                visited[tmpWord] = true;
+                tmpWord[index] = oldChar;
+                cout << endl;
+            }
+            cout << endl;
+        }
+
+        return 0;
+    }
+};
+
 
 // 别人44ms代码
 class Solution {
