@@ -19,7 +19,11 @@ public:
     }
 
 private:
-    int dfs(TreeNode* root, unordered_map<TreeNode*, int> mem) {
+    /*
+     * 注: mem为****引用****
+     * int dfs(TreeNode* root, unordered_map<TreeNode*, int> &mem)
+    */
+    int dfs(TreeNode* root, unordered_map<TreeNode*, int> &mem) {
         if (NULL == root)
             return 0;
         if (mem.find(root) == mem.end()) {
